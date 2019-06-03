@@ -1,16 +1,16 @@
-from .array import EasyJSONArray
-from .object import EasyJSONObject
-from .document import EasyJSONDocument
-from .expressions import EasyJSONStringValue, EasyJSONIntegerValue, EasyJSONBooleanValue, \
-                         EasyJSONFloatValue, EasyJSONNullValue
-from .value import EasyJSONValue
+from .array import Array
+from .object import Object
+from .string import String
+from .numbers import Integer, Float
+from .helper import Empty
+from .value import _Value
 
 
-class EasyJSONOrValue(EasyJSONValue):
+class EasyJSONOrValue(_Value):
     def __init__(self, schemas=tuple(), *args, **kwargs):
         super().__init__(*args, **kwargs)
         if not isinstance(schemas, tuple) or isinstance(schemas, list) \
-                or any(not isinstance(s, EasyJSONValue) for s in schemas):
+                or any(not isinstance(s, _Value) for s in schemas):
             raise RuntimeError("schemas is expected to be a tuple or list of EasyJSONValue")
         elif len(schemas) == 0:
             raise RuntimeError("EasyJSONOrValue expects at least 1 schema")

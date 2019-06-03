@@ -1,60 +1,135 @@
-from .object import EasyJSONObject
-from .array import EasyJSONArray
+from .object import _ObjectInstance
+from .array import _ArrayInstance
+from .helper import JSONObjectMetaclass, JSONArrayMetaclass
+from .value import _raise_bad_value_error
+from .value import _Value
 
 
-class EasyJSONDocument(object):
-    @staticmethod
-    def parse_json(srcstr):
+class JSONObjectDocument(object, metaclass=JSONObjectMetaclass):
+    __attributes__ = None
+
+    @classmethod
+    def compute_instance_attributes(cls):
+        result = {attr_name: attr_schema() for attr_name, attr_schema in cls.attributes().items()}
+        result.update({"__attributes__": [key for key, val in cls.attributes().items()]})
+        return result
+
+    @classmethod
+    def create(cls, **kwargs):
+        class_name = f"{cls.__name__}Instance"
+        result_type = type(class_name,
+                           (_ObjectInstance, ),
+                           cls.compute_instance_attributes())
+        return result_type(**kwargs)
+
+    @classmethod
+    def loads(cls, string):
         import json
         try:
-            return json.loads(srcstr)
+            return cls.load(json.loads(string))
         except json.JSONDecodeError as e:
-            print(e)
-            raise RuntimeError("The supplied document is not a valid JSON document")
+            raise e
 
-    @staticmethod
-    def validate_str(SrcDocument, srcstr):
-        if not issubclass(SrcDocument, EasyJSONObject) and not issubclass(SrcDocument, EasyJSONArray):
-            raise RuntimeError("Can only validate against JSON objects or arrays")
-        elif not isinstance(srcstr, str):
-            raise RuntimeError("validate_str only validates strings")
+    @classmethod
+    def load(cls, obj):
+        if not isinstance(obj, dict):
+            _raise_bad_value_error(obj, "Expected a dict type object")
 
-        return EasyJSONDocument.validate(SrcDocument,
-                                         EasyJSONDocument.parse_json(srcstr))
+        result = cls.create(**obj)
+        return result
 
-    @staticmethod
-    def validate(SrcDocument, src):
-        if not issubclass(SrcDocument, EasyJSONObject) and not issubclass(SrcDocument, EasyJSONArray):
-            raise RuntimeError("Can only validate against JSON objects or arrays")
-        return SrcDocument().validate(src)
+    @classmethod
+    def attributes(cls):
+        return cls.__attributes__
 
-    @staticmethod
-    def compute_str(SrcDocument, srcstr):
-        if not issubclass(SrcDocument, EasyJSONObject) and not issubclass(SrcDocument, EasyJSONArray):
-            raise RuntimeError("EasyJSONDocument computations are only available for "
-                               "JSON objects or array")
-        elif not isinstance(srcstr, str):
-            raise RuntimeError("EasyJSONDocument.compute_str only handles string inputs")
 
-        jsondoc = EasyJSONDocument.parse_json(srcstr)
+class JSONArrayDocument(object, metaclass=JSONArrayMetaclass):
+    __schema__ = None
 
-        doc = SrcDocument()
-        success, error = doc.validate(jsondoc)
-        if not success:
-            raise RuntimeError("EasyJSONDocument.compute failed because the supplied "
-                               "document is not valid.\n"
-                               f"Error: {error}")
-        return doc.compute(jsondoc)
+    @classmethod
+    def create(cls, *values):
+        class_name = f"{cls.__name__}Instance"
+        result_type = type(class_name,
+                           (_ArrayInstance,),
+                           {"__schema__": cls.__schema__})
+        if len(values) == 1 and isinstance(values[0], (list, tuple)):
+            return result_type(*values[0])
+        return result_type(*values)
 
-    @staticmethod
-    def compute(SrcDocument, src):
-        if not issubclass(SrcDocument, EasyJSONObject) and not issubclass(SrcDocument, EasyJSONArray):
-            raise RuntimeError("EasyJSONDocument computations are only available for "
-                               "JSON objects or array")
-        doc = SrcDocument()
-        success, error = doc.validate(src)
-        if not success:
-            raise RuntimeError("EasyJSONDocument.compute failed because the supplied "
-                               "document is not valid.\n"
-                               f"Error: {error}")
-        return doc.compute(src)
+    @classmethod
+    def loads(cls, string):
+        import json
+        try:
+            return cls.load(json.loads(string))
+        except json.JSONDecodeError as e:
+            raise e
+
+    @classmethod
+    def load(cls, *values):
+        return cls.create(*values)
+
+    @classmethod
+    def schema(cls):
+        return cls.__schema__
+
+#
+# def validate_str(SrcDocument, srcstr):
+#     __check_src_type(SrcDocument,
+#                      (Object, Array),
+#                      "Can only validate against JSON objects or arrays")
+#     assert isinstance(srcstr, str)
+#     return __validate(SrcDocument, __parse_json(srcstr))
+#
+#
+# def validate(SrcDocument, src):
+#     __check_src_type(SrcDocument,
+#                      (Object, Array),
+#                      "Can only validate against JSON objects or arrays")
+#     return __validate(SrcDocument, src)
+#
+#
+# def __validate(SrcDocument, src):
+#     assert isinstance(src, (dict, list))
+#     return SrcDocument().validate(src)
+#
+#
+# def compute_str(SrcDocument, srcstr):
+#     __check_src_type(SrcDocument,
+#                      (Object, Array),
+#                      "EasyJSONDocument computations are only available for JSON objects or array")
+#
+#     assert isinstance(srcstr, str)
+#     return __compute(SrcDocument, __parse_json(srcstr))
+#
+#
+# def compute(SrcDocument, src):
+#     __check_src_type(SrcDocument,
+#                      (Object, Array),
+#                      "EasyJSONDocument computations are only available for JSON objects or array")
+#     return __compute(SrcDocument, src)
+#
+#
+# def __compute(SrcDocument, src):
+#     doc = SrcDocument()
+#     success, error = doc.validate(src)
+#     if not success:
+#         raise RuntimeError("EasyJSONDocument.compute failed because the supplied "
+#                            "document is not valid.\n"
+#                            f"Error: {error}")
+#     return doc.compute(src)
+#
+#
+# def __check_src_type(src, types, error_string):
+#     for t in types:
+#         if issubclass(src, t):
+#             return
+#     raise RuntimeError(error_string)
+#
+#
+# def __parse_json(srcstr):
+#     import json
+#     try:
+#         return json.loads(srcstr)
+#     except json.JSONDecodeError as e:
+#         print(e)
+#         raise RuntimeError("The supplied document is not a valid JSON document")

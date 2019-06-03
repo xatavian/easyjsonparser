@@ -1,32 +1,28 @@
-from .object import EasyJSONValue
-from .helper import EASY_NONEHELPER
-
-class EasyJSONIntegerValue(EasyJSONValue):
-    def validate(self, srcval):
-        return isinstance(srcval, int), 'Integer expected'
+from .value import _Value, _ValueInstance, _raise_bad_value_error
+from .helper import Empty
 
 
-class EasyJSONBooleanValue(EasyJSONValue):
-    def validate(self, srcval):
-        return isinstance(srcval, bool), 'Boolean expected'
+class Null(_Value):
+    def compute_instance_type(self):
+        result_type = type("NullInstance",
+                           (_NullInstance, ),
+                           self._default_value_instance_params())
+        return result_type
+
+    def check_params(self):
+        if self.default is not None:
+            _raise_bad_value_error(self.default, "Default value of a Null value can only be None.")
+        super().check_params()
 
 
-class EasyJSONStringValue(EasyJSONValue):
-    def validate(self, srcval):
-        return isinstance(srcval, str), 'String expected'
+class _NullInstance(_ValueInstance):
+    def compute_to_json(self):
+        return "null"
 
-
-class EasyJSONFloatValue(EasyJSONValue):
-    def validate(self, srcval):
-        return isinstance(srcval, float), 'Float expected'
-
-
-class EasyJSONNullValue(EasyJSONValue):
-    def __init__(self, *args, **kwargs):
-        if "default" not in kwargs or \
-                kwargs["default"] is EASY_NONEHELPER:
-            kwargs["default"] = None
-        super().__init__(*args, **kwargs)
-
-    def validate(self, srcval):
-        return srcval is None, 'Null expected'
+    def check_and_sanitize_input(self, value):
+        if value is None:
+            return value
+        elif value is not Empty:
+            _raise_bad_value_error(value, self.__property_name__, "None expected")
+        else:
+            return super().check_and_sanitize_input(value)

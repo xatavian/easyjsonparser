@@ -1,37 +1,121 @@
-from .helper import EASY_NONEHELPER
+from .helper import Empty
 from typing import Any
+from .instance import InstanceCreator
 
 
-class EasyJSONValue(object):
-    __computed_schema = False
-    __schema = None
+def _raise_conversion_warning():
+    print(f"Warning: conversion will happen")
 
-    def get_schema(self):
-        if self.__class__.__computed_schema:
-            return self.__class__.__schema
 
-        result = self._get_schema()
-        self.__class__.__schema = result
-        self.__class__.__computed_schema = True
-        return result
+def _raise_bad_value_error(value, property_name=None, explanation=""):
+    if property_name is None:
+        raise RuntimeError(f"Error: invalid value {value}. {explanation}")
+    raise RuntimeError(f"Error: invalid value {value} for property {property_name}. {explaination}")
 
-    def _get_schema(self):
-        return self
 
-    def __init__(self, optional: bool=False, default: Any=EASY_NONEHELPER):
-        self._optional = optional
+class _Value(object):
+    """
+    <Abstract class>
+    Represents any JSON value.
+    Constructor arguments:
+    -> default: During parsing, value to provide if none is supplied
+    """
+    __property_name__ = None
+    # @classmethod
+    # def get_schema(cls):
+    #     if cls.__schema is not EASY_NONEHELPER:
+    #         return cls.__schema
+    #
+    #     result = cls.compute_schema()
+    #     cls.__schema = result
+    #     return result
+    #
+    # @classmethod
+    # def compute_schema(cls):
+    #     return cls
+
+    def compute_instance_type(self):
+        return type("ValueType",
+                    (_ValueInstance,),
+                    self._default_value_instance_params())
+
+    def _default_value_instance_params(self):
+        return {
+            "__default__": self.default,
+            "__optional__": self.is_optional,
+            "__property_name__": self.__property_name__
+        }
+
+    def __init__(self, default: Any=Empty, optional: bool=False):
         self._default = default
+        self._optional = optional
+        self._instance_creator = InstanceCreator()
 
-    def validate(self, srcval):
-        raise NotImplementedError()
+        self.check_params()
+        self._instance_creator.compute_instance_type(self.compute_instance_type)
 
-    def compute(self, srcval):
-        return srcval if srcval is not None else self._default
+    def check_params(self):
+        if self.default is not Empty:
+            raise RuntimeError('BadValueError: Unexpected class type '
+                               f'"{type(self.default)}" for the default value')
 
     @property
-    def optional(self):
+    def is_optional(self):
         return self._optional
 
     @property
     def default(self):
         return self._default
+
+    def __call__(self, *args, **kwargs):
+        return self._instance_creator.instance_type(*args, **kwargs)
+
+
+class _ValueInstance(object):
+    __default__ = Empty
+    __optional__ = False
+    __explanations__ = {
+        "missing_value": "You must set a value to the parameter in order to print it"
+    }
+    __property_name__ = None
+
+    def __init__(self, value: Any=Empty):
+        self._value = value
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, next_value):
+        self._value = self.check_and_sanitize_input(next_value)
+
+    def __repr__(self):
+        return '<JSON Value {classname}: {value}>'.format(
+            classname=self.__class__.__name__,
+            value=self.value
+        )
+
+    def __str__(self):
+        return self.__repr__()
+
+    @property
+    def is_optional(self):
+        return self.__optional__
+
+    def check_and_sanitize_input(self, value):
+        if value is not Empty:
+            raise RuntimeError("Error: trying to unset a value while it is not optional")
+        return value
+
+    def fill(self, src):
+        print("Fill", self.__class__.__name__)
+        self.value = src
+
+    def to_json(self):
+        if self.value is Empty and not self.is_optional:
+            _raise_bad_value_error(self.value, self.__property_name__, _ValueInstance.__explanations__["missing_value"])
+        return self.compute_to_json()
+
+    def compute_to_json(self):
+        raise NotImplementedError()
