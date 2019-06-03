@@ -1,13 +1,11 @@
-from .object import _ObjectInstance
-from .array import _ArrayInstance
+from .object import Object, _ObjectInstance
+from .array import Array, _ArrayInstance
 from .helper import JSONObjectMetaclass, JSONArrayMetaclass
 from .value import _raise_bad_value_error
 from .value import _Value
 
 
-class JSONObjectDocument(object, metaclass=JSONObjectMetaclass):
-    __attributes__ = None
-
+class JSONObjectDocument(Object, metaclass=JSONObjectMetaclass):
     @classmethod
     def compute_instance_attributes(cls):
         result = {attr_name: attr_schema() for attr_name, attr_schema in cls.attributes().items()}
@@ -38,14 +36,8 @@ class JSONObjectDocument(object, metaclass=JSONObjectMetaclass):
         result = cls.create(**obj)
         return result
 
-    @classmethod
-    def attributes(cls):
-        return cls.__attributes__
 
-
-class JSONArrayDocument(object, metaclass=JSONArrayMetaclass):
-    __schema__ = None
-
+class JSONArrayDocument(Array, metaclass=JSONArrayMetaclass):
     @classmethod
     def create(cls, *values):
         class_name = f"{cls.__name__}Instance"

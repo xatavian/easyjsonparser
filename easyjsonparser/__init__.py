@@ -1,7 +1,7 @@
 from .array import Array
 from .object import Object
 from .string import String
-from .numbers import Integer, Float
+from .numbers import Integer, Float, Boolean
 from .helper import Empty
 from .value import _Value
 

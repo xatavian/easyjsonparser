@@ -118,8 +118,6 @@ class _ObjectInstance(object):
             super().__setattr__(key, value)
 
     def fill(self, src):
-        print("Fill", self.__class__.__name__)
-
         if not isinstance(src, dict):
             _raise_bad_value_error(src, self.__property_name__, "Dict type expected")
 

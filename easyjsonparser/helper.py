@@ -24,7 +24,6 @@ class JSONObjectMetaclass(type):
         if name == "Object" or name == "object":
             return super().__new__(cls, name, bases, attrs)
 
-        print("Initializing", name)
         if "__attributes__" not in attrs:
             attrs.update({
                 "__attributes__": {key: JSONObjectMetaclass.add_property_name(key, schema)
