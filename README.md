@@ -27,7 +27,11 @@ EasyJSONParser is built for Python 3.
 
 # Installation
 
-TODO: setup on PyPi
+Get the library from Pypi:
+
+```bash
+> pip install easyjsonparser
+```
 
 # Basic examples
 
@@ -188,10 +192,10 @@ class MyObject(ejp.Object):
 
 *Note: remember that you need to use `JSONArrayDocument` to define a top-level array*.
 
-## ejp.Empty()
+## `ejp.Empty()`
 
 Represents an empty value. Used for optional properties/values: if you want to clear the content of an optional parameter, set its value to `ejp.Empty()`.
 
 # License
 
-No licensing yet
+This software is distributed under the [MIT license](LICENSE)
