@@ -5,7 +5,7 @@ with open("README.md", "r") as file:
   
 setuptools.setup(
   name="easyjsonparser",
-  version="1.0.0",
+  version="1.0.1",
   author="Avi SZYCHTER",
   author_email="xentsc2@gmail.com",
   description="Serialize and deserialize JSON documents to Python data structures",
