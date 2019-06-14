@@ -12,7 +12,7 @@ class Object(_Value, metaclass=JSONObjectMetaclass):
         return result
 
     def compute_instance_type(self):
-        class_name = f"{self.__class__.__name__}Instance"
+        class_name = "{classname}Instance".format(classname=self.__class__.__name__)
         result = type(class_name,
                       (_ObjectInstance, ),
                       self.compute_instance_attributes())
@@ -24,8 +24,8 @@ class Object(_Value, metaclass=JSONObjectMetaclass):
 
         for key, attr in self.default.items():
             if key not in self.__attributes__:
-                raise RuntimeError(f"Bad default value: {key} is not a registered "
-                                   f"attribute of {self.__class__.__name__}")
+                raise RuntimeError("Bad default value: {key} is not a registered "
+                                   "attribute of {classname}".format(key=key, classname=self.__class__.__name__))
 
     @classmethod
     def attributes(cls):
@@ -75,8 +75,9 @@ class _ObjectInstance(object):
         for key, val in kwargs.items():
             if key not in self.__attributes__:
                 raise RuntimeError("Error during object instantiation: "
-                                   f'invalid keyword "{key}" supplied. '
-                                   f'List of valid attributes: {self.__attributes__}')
+                                   'invalid keyword "{key}" supplied. '
+                                   'List of valid attributes: {attributes}'.format(key=key,
+                                                                                   attributes=self.__attributes__))
             setattr(self, key, val)
 
     def __repr__(self):
@@ -88,7 +89,8 @@ class _ObjectInstance(object):
     def __str__(self):
         return "<JSON {classname}: {{{content}}}>".format(
             classname=self.__class__.__name__,
-            content=', '.join(f'"{objname}": {getattr(self, objname)}' for objname in self.__attributes__)
+            content=', '.join('"{name}": {value}'.format(name=objname, value=getattr(self, objname))
+                              for objname in self.__attributes__)
         )
 
     def to_json(self):
@@ -102,7 +104,7 @@ class _ObjectInstance(object):
             return True
 
         return "{{{content}}}".format(
-            content=", ".join(f'"{attr}": {getattr(self, attr).to_json()}'
+            content=", ".join('"{attr}": {value}'.format(attr=attr, value=getattr(self, attr).to_json())
                               for attr in self.__attributes__ if attr_to_print(attr))
         )
 
@@ -125,8 +127,8 @@ class _ObjectInstance(object):
             if key not in self.__attributes__:
                 _raise_bad_value_error(src,
                                        self.__property_name__,
-                                       f'Unexpected key {key} for object-type '
-                                       f'"{self.__class__.__name__}"')
+                                       'Unexpected key {key} for object-type '
+                                       '"{classname}"'.format(key=key, classname=self.__class__.__name__))
             getattr(self, key).fill(value)
 
     @property

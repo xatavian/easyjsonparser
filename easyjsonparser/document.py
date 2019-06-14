@@ -14,7 +14,7 @@ class JSONObjectDocument(Object, metaclass=JSONObjectMetaclass):
 
     @classmethod
     def create(cls, **kwargs):
-        class_name = f"{cls.__name__}Instance"
+        class_name = "{classname}Instance".format(classname=cls.__name__)
         result_type = type(class_name,
                            (_ObjectInstance, ),
                            cls.compute_instance_attributes())
@@ -40,7 +40,7 @@ class JSONObjectDocument(Object, metaclass=JSONObjectMetaclass):
 class JSONArrayDocument(Array, metaclass=JSONArrayMetaclass):
     @classmethod
     def create(cls, *values):
-        class_name = f"{cls.__name__}Instance"
+        class_name = "{classsname}Instance".format(classsname=cls.__name__)
         result_type = type(class_name,
                            (_ArrayInstance,),
                            {"__schema__": cls.__schema__})

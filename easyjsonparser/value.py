@@ -4,13 +4,16 @@ from .instance import InstanceCreator
 
 
 def _raise_conversion_warning():
-    print(f"Warning: conversion will happen")
+    print("Warning: conversion will happen")
 
 
 def _raise_bad_value_error(value, property_name=None, explanation=""):
     if property_name is None:
-        raise RuntimeError(f"Error: invalid value {value}. {explanation}")
-    raise RuntimeError(f"Error: invalid value {value} for property {property_name}. {explaination}")
+        raise RuntimeError("Error: invalid value {value}. {explanation}".format(value=value, explanation=explanation))
+    raise RuntimeError("Error: invalid value {value} for property {property}. "
+                       "{explaination}".format(value=value,
+                                               property=property_name,
+                                               explaination=explanation))
 
 
 class _Value(object):
@@ -57,7 +60,7 @@ class _Value(object):
     def check_params(self):
         if self.default is not Empty:
             raise RuntimeError('BadValueError: Unexpected class type '
-                               f'"{type(self.default)}" for the default value')
+                               '"{value_type}" for the default value'.format(value_type=type(self.default)))
 
     @property
     def is_optional(self):
@@ -109,7 +112,7 @@ class _ValueInstance(object):
         return value
 
     def fill(self, src):
-        print("Fill", self.__class__.__name__)
+        # print("Fill", self.__class__.__name__)
         self.value = src
 
     def to_json(self):

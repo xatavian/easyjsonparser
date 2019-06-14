@@ -19,11 +19,11 @@ class _StringInstance(_ValueInstance):
     def __repr__(self):
         return "<JSON Value {classname}: {value}>".format(
             classname=self.__class__.__name__,
-            value=self.value if not isinstance(self.value, str) else f'"{self.value}"'
+            value='"{}"'.format(self.value) if isinstance(self.value, str) else self.value
         )
 
     def compute_to_json(self):
-        return f'"{self.value}"'
+        return '"{}"'.format(self.value)
 
     def check_and_sanitize_input(self, value):
         if isinstance(value, str):
