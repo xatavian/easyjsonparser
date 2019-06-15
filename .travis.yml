@@ -1,8 +1,7 @@
 language: python
 install: true
 
-test:
-  script: python3 -m unittest
+script: python3 -m unittest
 
 deploy:
   provider: pypi
