@@ -83,6 +83,9 @@ class _ArrayInstance(object):
     def value(self, value):
         self.__values = self.check_and_sanitize_input(value)
 
+
+    def fill(self, value):
+        self.value = value
+        
     def to_json(self):
         return "[{}]".format(", ".join(array_val.to_json() for array_val in self.value))
-
