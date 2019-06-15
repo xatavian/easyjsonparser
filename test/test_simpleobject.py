@@ -27,7 +27,7 @@ class TestSimpleObject(unittest.TestCase):
 
     def test_find(self):
         obj = SimpleObject.loads(self.test_string)
-        result = obj.find(SimpleObject.str_attr2)
+        result = obj.find(String)
         self.assertEqual(result, "string")
 
 

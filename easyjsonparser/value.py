@@ -170,9 +170,10 @@ class _ValueInstance(object):
 
     def find(self, targetschema):
         """
-        Returns the first instance that matches the given schema
+        Returns the first instance that matches the given schema or Empty()
+        if none was found.
         """
-        return None
+        return Empty()
 
     def find_all(self, targetschema):
         """

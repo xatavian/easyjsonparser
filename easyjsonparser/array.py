@@ -1,6 +1,6 @@
 from .value import _Value, _ValueInstance, _raise_bad_value_error
 from .helper import JSONArrayMetaclass, NotPrimitiveInstance, \
-                    _get_value_if_primitive
+                    _get_value_if_primitive, Empty
 
 
 class Array(_Value, metaclass=JSONArrayMetaclass):
@@ -87,7 +87,13 @@ class _ArrayInstance(_ValueInstance, NotPrimitiveInstance):
             content=", ".join(str(val) for val in self.value))
 
     def __getitem__(self, key):
-        return self.value[key]
+        return _get_value_if_primitive(self.value[key])
+
+    def __setitem__(self, key, value):
+        self.__values[key].value = value
+
+    def __len__(self):
+        return len(self.value)
 
     @property
     def value(self):
@@ -116,11 +122,21 @@ class _ArrayInstance(_ValueInstance, NotPrimitiveInstance):
     def find(self, targetschema):
         if isinstance(self.__schema__, targetschema):
             return _get_value_if_primitive(
-                self.value[0] if len(self.value) > 0 else None
+                self.value[0] if len(self.value) > 0 else Empty()
             )
         elif isinstance(self.__schema__, NotPrimitiveInstance):
             for val in self.value:
                 child_val = val.find(targetschema)
                 if child_val is not None:
                     return child_val
-        return None
+        return Empty()
+
+    def find_all(self, targetschema):
+        if isinstance(self.__schema__, targetschema):
+            return self.value
+        elif isinstance(self.__schema__, NotPrimitiveInstance):
+            result = []
+            for val in self.value:
+                result.extend(val.find_all(targetschema))
+            return []
+        return []

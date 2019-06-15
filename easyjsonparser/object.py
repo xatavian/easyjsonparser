@@ -1,6 +1,6 @@
 from .value import _Value, _ValueInstance, _raise_bad_value_error
 from .helper import JSONObjectMetaclass, Empty, NotPrimitiveInstance, \
-                    _get_value_if_primitive, _set_value_of_primitive
+                    _get_value_if_primitive
 
 
 class Object(_Value, metaclass=JSONObjectMetaclass):
@@ -96,7 +96,7 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
         def accessmethod(self, val):
             if name not in self.__internal_dict:
                 self.__internal_dict[name] = schema()
-            _set_value_of_primitive(self.__internal_dict[name], name, val)
+            self.__internal_dict[name].value = val
 
         return accessmethod
 
@@ -125,7 +125,7 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
 
         def attr_to_print(attr):
             entry = getattr(self, attr)
-            if entry.value is Empty and entry.is_optional:
+            if entry.value is Empty() and entry.is_optional:
                 return False
             return True
 
@@ -141,12 +141,12 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
 
         return _get_value_if_primitive(builtin_getattr(self, item))
 
-    def __setattribute__(self, item, value):
+    def __setattr__(self, item, value):
         if item not in self.__attributes__:
-            return setattr(self, item, value)
+            return object.__setattr__(self, item, value)
 
         attr_schema = object.__getattribute__(self, item)
-        _set_value_of_primitive(attr_schema, item, value)
+        attr_schema.value = value
 
     def check_and_sanitize_input(self, value):
         if not isinstance(value, dict):
@@ -173,16 +173,32 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
     @value.setter
     def value(self, newval):
         src = self.check_and_sanitize_input(newval)
-        for key, value in src.items():
-            self.__setattribute__(key, value)
+        if src is Empty():
+            for key in self.__attributes__:
+                setattr(self, key, Empty())
+        else:
+            for key, value in src.items():
+                setattr(self, key, value)
 
     def find(self, targetschema):
         for attr in self.__schema__.attributes():
             child_schema = getattr(self.__schema__, attr)
-            if child_schema == targetschema:
-                return getattr(self, attr)
+            if isinstance(child_schema, targetschema):
+                val = getattr(self, attr)
+                if val is not Empty():
+                    return val
             elif isinstance(child_schema, NotPrimitiveInstance):
-                child_val = child_schema.find(targetschema)
+                child_val = getattr(self, attr).find(targetschema)
                 if child_val is not None:
                     return child_val
-        return None
+        return Empty()
+
+    def find_all(self, targetschema):
+        result = []
+        for attr in self.__schema__.attributes():
+            child_schema = getattr(self.__schema__, attr)
+            if isinstance(child_schema, targetschema):
+                result.append(getattr(self, attr))
+            elif isinstance(child_schema, NotPrimitiveInstance):
+                result.extend(getattr(self, attr).findAll(targetschema))
+        return result

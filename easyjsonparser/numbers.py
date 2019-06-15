@@ -1,4 +1,5 @@
-from .value import _Value, _ValueInstance, _raise_conversion_warning, _raise_bad_value_error
+from .value import _Value, _ValueInstance, _raise_conversion_warning, \
+                   _raise_bad_value_error
 from .helper import Empty
 
 
@@ -33,7 +34,7 @@ class _IntegerInstance(_ValueInstance):
         elif _is_convertible(value.__class__):
             _raise_conversion_warning()
             return int(value)
-        elif value is not Empty:
+        elif value is not Empty():
             _raise_bad_value_error(value, "Integer type expected")
         else:
             super().check_and_sanitize_input(value)
@@ -66,8 +67,9 @@ class _FloatInstance(_ValueInstance):
         elif _is_convertible(value.__class__):
             _raise_conversion_warning()
             return float(value)
-        elif value is not Empty:
-            _raise_bad_value_error(value, self.__property_name__, "Integer type expected")
+        elif value is not Empty():
+            _raise_bad_value_error(
+                value, self.__property_name__, "Integer type expected")
         else:
             super().check_and_sanitize_input(value)
 
@@ -99,7 +101,8 @@ class _BoolInstance(_ValueInstance):
         elif _is_convertible(value.__class__):
             _raise_conversion_warning()
             return bool(value)
-        elif value is not Empty:
-            _raise_bad_value_error(value, self.__property_name__, "Integer type expected")
+        elif value is not Empty():
+            _raise_bad_value_error(
+                value, self.__property_name__, "Integer type expected")
         else:
             return super().check_and_sanitize_input(value)

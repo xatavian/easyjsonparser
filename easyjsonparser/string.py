@@ -33,7 +33,7 @@ class _StringInstance(_ValueInstance):
     def check_and_sanitize_input(self, value):
         if isinstance(value, str):
             return value
-        elif value is not Empty:
+        elif value is not Empty():
             _raise_bad_value_error(
                 value, self.__property_name__, "String type expected")
         else:

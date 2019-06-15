@@ -13,13 +13,6 @@ def _get_value_if_primitive(schema):
     return schema
 
 
-def _set_value_of_primitive(schema, key, val):
-    if not isinstance(schema, NotPrimitiveInstance):
-        schema.value = val
-    else:
-        setattr(schema, key, val)
-
-
 class JSONObjectMetaclass(type):
     @staticmethod
     def add_property_name(key, schema):
