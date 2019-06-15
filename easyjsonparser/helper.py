@@ -1,17 +1,16 @@
 import inspect
 
-class PrivateEasyNoneHelper:
-    def __repr__(self):
-        return '<Empty value>'
-
-    def __str__(self):
-        return self.__repr__()
-
 
 def _valid_entry(key, val):
     return (not (key.startswith("__") and key.endswith("__"))) \
            and not inspect.isclass(val) \
            and not inspect.ismethod(val)
+
+
+def _get_value_if_primitive(schema):
+    if not isinstance(schema, NotPrimitiveInstance):
+        return schema.value
+    return schema
 
 
 class JSONObjectMetaclass(type):
@@ -43,8 +42,32 @@ class JSONArrayMetaclass(type):
 
         if "__schema__" not in attrs:
             attrs.update({
-                "__schema__": attrs.get("schema")
+                "__schema__": attrs.pop("schema")
             })
         return super().__new__(cls, name, bases, attrs)
 
-Empty = PrivateEasyNoneHelper()
+
+class NotPrimitiveInstance(object):
+    pass
+
+
+class PrivateEasyNoneHelper(NotPrimitiveInstance):
+    def __repr__(self):
+        return '<Empty value>'
+
+    def __str__(self):
+        return self.__repr__()
+
+
+_helperEmpty = None
+
+
+def Empty():
+    """
+    Returns a comprehensible empty value. The idea behind this is that None is
+    an acceptable value for null so we need something different
+    """
+    global _helperEmpty
+    if _helperEmpty is None:
+        _helperEmpty = PrivateEasyNoneHelper()
+    return _helperEmpty

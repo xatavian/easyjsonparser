@@ -1,23 +1,28 @@
+import unittest
 from easyjsonparser.document import JSONArrayDocument
+from easyjsonparser.array import _ArrayInstance
 import easyjsonparser as ejp
 
-class TestArray(JSONArrayDocument):
-    schema = ejp.String()
 
-class TestArray2(JSONArrayDocument):
-    class Object1(ejp.Object):
+class SimpleArray(JSONArrayDocument):
+    class SchemaObject(ejp.Object):
         attr1 = ejp.Integer()
         attr2 = ejp.String()
-    schema = Object1()
+    schema = SchemaObject()
 
-array = TestArray.create(["Hello", "Hello2"])
-print(array.to_json())
 
-array2 = TestArray2.create({
-    "attr1": 1, "attr2": "str"
-})
-array3 = TestArray2.loads("""
-[{"attr1": 14, "attr2": "14"}]
-""")
-print(array2, array2.to_json())
-print(array3, array3.to_json())
+class TestArrayDocument(unittest.TestCase):
+    test_string = """[
+        {"attr1": 10, "attr2": "string1"},
+        {"attr1": 20, "attr2": "string2"}
+    ]"""
+
+    def test_loads(self):
+        array = SimpleArray.loads(self.test_string)
+        self.assertTrue(isinstance(array, _ArrayInstance))
+        self.assertEqual(array[0].attr1, 10)
+        self.assertEqual(array[1].attr1, 20)
+
+    def test_find(self):
+        array = SimpleArray.loads(self.test_string)
+        self.assertEqual(array.find(SimpleArray.SchemaObject), array[0])

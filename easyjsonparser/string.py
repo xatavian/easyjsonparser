@@ -3,6 +3,10 @@ from .helper import Empty
 
 
 class String(_Value):
+    """
+    Schema-class for JSON strings.
+    """
+
     def compute_instance_type(self):
         result_type = type("StringInstance",
                            (_StringInstance, ),
@@ -19,7 +23,8 @@ class _StringInstance(_ValueInstance):
     def __repr__(self):
         return "<JSON Value {classname}: {value}>".format(
             classname=self.__class__.__name__,
-            value='"{}"'.format(self.value) if isinstance(self.value, str) else self.value
+            value='"{}"'.format(self.value)
+                  if isinstance(self.value, str) else self.value
         )
 
     def compute_to_json(self):
@@ -28,10 +33,8 @@ class _StringInstance(_ValueInstance):
     def check_and_sanitize_input(self, value):
         if isinstance(value, str):
             return value
-        elif value is not Empty:
-            _raise_bad_value_error(value, self.__property_name__, "String type expected")
+        elif value is not Empty():
+            _raise_bad_value_error(
+                value, self.__property_name__, "String type expected")
         else:
             return super().check_and_sanitize_input(value)
-
-    def fill(self, src):
-        self.value = src

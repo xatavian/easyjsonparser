@@ -1,0 +1,23 @@
+language: python
+install: true
+script: python3 -m unittest
+
+env:
+  global:
+    - secure: iQ/3i0KZwo84VTbWz0g1cW7mGGcRnZVLzdsJGl1EkOvc8l7gxr2XNra+6ybFwfXigK7UC7WNza0vdDSpY81wgD4dCReLHEq00+InvpTQlU6nBzn+Zj1dBPVKCyzQw13yvIEPkSfrWk5G/+uPnMDarp+huZ1UOM1OvOco0STAmdxa/hxK40PKDkYKcwMx5xaHfSZO4jMVKlCCkI8/DHFtdn5OyGiOHJG1fJT7e9jFtob91GiPA1dUbBuWHLQXcOo5TuKQBXQoSd4CGbGPinbT9iay0jjXJC1rYw0ZJIpsoIeq5WOA+vPp+VoADzruXfPs+WVuTrIxhrORRXEnTMZVVumoEEMbHfKBYeU2Gz/tX9T5lqL7uq8KcrTWJ9kxGMFPRk/azXRphDv3zhkMLn76tLt8rWkc05bQvrLGKPgDIYTI/GHUA752b34ZZESOHqWP3UKWwTFtPHxqlXsGTY+Vnotg1ULE2wMNtq/bYRxH3Zxoad4SUuaC9INZnlLzssNVOnlYK14MmqLqmw1gLbvHdtmlLUZlUWyY2kI+PvM5msaKnSDVUzCZ0uxmu+W5MhPbRzi4zAvEOia7NQxJx3WEEAEInsbID+rB7UaK7YV/dK9kzuROgJl76Uc9QC6cP0fKsH5r6g6xJIiGw4MgHcXvuS1k3TBtNooRfmUuIHSKsO8=
+
+deploy:
+- provider: pypi
+  server: https://test.pypi.org/legacy/
+  user: xatavian
+  password:
+    secure: "$PYPI_PASSWORD"
+  on:
+    branch: development
+  skip_existing: true
+- provider: pypi
+  user: xatavian
+  password:
+    secure: "$PYPI_PASSWORD"
+  on:
+    tags: true

@@ -2,14 +2,17 @@ from .object import Object, _ObjectInstance
 from .array import Array, _ArrayInstance
 from .helper import JSONObjectMetaclass, JSONArrayMetaclass
 from .value import _raise_bad_value_error
-from .value import _Value
 
 
 class JSONObjectDocument(Object, metaclass=JSONObjectMetaclass):
     @classmethod
     def compute_instance_attributes(cls):
-        result = {attr_name: attr_schema() for attr_name, attr_schema in cls.attributes().items()}
-        result.update({"__attributes__": [key for key, val in cls.attributes().items()]})
+        result = {attr_name: attr_schema()
+                  for attr_name, attr_schema in cls.attributes().items()}
+        result.update({
+            "__attributes__": [key for key in cls.attributes()],
+            "__schema__": cls
+        })
         return result
 
     @classmethod
@@ -46,13 +49,15 @@ class JSONArrayDocument(Array, metaclass=JSONArrayMetaclass):
                            {"__schema__": cls.__schema__})
         if len(values) == 1 and isinstance(values[0], (list, tuple)):
             return result_type(*values[0])
+
         return result_type(*values)
 
     @classmethod
     def loads(cls, string):
         import json
         try:
-            return cls.load(json.loads(string))
+            load = json.loads(string)
+            return cls.load(*load)
         except json.JSONDecodeError as e:
             raise e
 

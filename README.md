@@ -2,6 +2,9 @@ EasyJSONParser, a lightweight library for parsing and validating your
 JSON models
 =================================================================================
 
+[![Build Status](https://travis-ci.com/xatavian/easyjsonparser.svg?branch=master)](https://travis-ci.com/xatavian/easyjsonparser)
+
+
 Modern Web frameworks all use ORM systems in order to achieve the
 server-side actions on the database: for instance, Doctrine for Symfony3
 (PHP), Mongoose for MongoDB databases.

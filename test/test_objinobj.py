@@ -1,5 +1,6 @@
 from easyjsonparser.document import JSONObjectDocument
 import easyjsonparser as ejp
+import unittest
 
 
 class TestObjectWithObject(JSONObjectDocument):
@@ -8,16 +9,22 @@ class TestObjectWithObject(JSONObjectDocument):
         attr2 = ejp.Integer()
     prop = ObjectProperty()
 
-obj1 = TestObjectWithObject.load({
-    "prop": {
-        "attr1": "1", "attr2": 1
-    }
-})
-obj2 = TestObjectWithObject.load({
-    "prop": {
-        "attr1": "2", "attr2": 2
-    }
-})
 
-print(obj1.to_json())
-print(obj2.to_json())
+class TestObjInObj(unittest.TestCase):
+    def test_load(self):
+        obj1 = TestObjectWithObject.load({
+            "prop": {
+                "attr1": "1", "attr2": 1
+            }
+        })
+        self.assertTrue(obj1.prop.attr2, 1)
+
+    @unittest.skip
+    def test_find(self):
+        obj = TestObjectWithObject.load({
+            "prop": {
+                "attr1": "1", "attr2": 1
+            }
+        })
+        self.assertEqual(obj.find(ejp.Integer), 1)
+        self.assertEqual(obj.find(ejp.String), "1")
