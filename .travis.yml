@@ -3,21 +3,21 @@ install: true
 
 script: python3 -m unittest
 
+env:
+  global:
+    - PYPI_PASSWORD: Vomgv8jyloLuqdUbVFKUtd7BUGCP/g8/pK1N8OdwcsrtEt3Y5QEqrY5efln2TmfEHTX4FREjayGF5/0FCMSbm2MfBZ8VSfsnuJRjesr7veev1api60I7XpnZZGwwEcofkTTEtlnus9U+MtROKyiTNVIMd38bRQM5FguPvvopUt8Zj68yrbunZkJSFbxQu2iUkIzvGxSugsHAMtYBXHpm3/3j3V4FMUMvf3k1vu85Tr/IYUMHwXercwsCEi4lphJcj1VhWyKRl1oqdlxMv+Mpgd8NrKyKzLpLjxdR/CcCTV6+Z8P4APc1Dd30nU6d75vV14vPT2gScfvJfKLlVYdQNbReMr06pDWf+6VeMyoPMhbzhqSwP+z8+TeakTwFJYHCuP1scIVkAIb1zztC8k+KPY3+kKQCGBkxHoOouqJJXaFXx4OeTsQpRPdxkHV+5Zq+BonD5HUv1tlqI6h1BactOxGpRXfTHnV+B7szDhI9k+GgTTNS8TBDboqP6794RBxa4WHdOi7u8FooQlTjntcQsrqTSESqzwqcGe18fx3O9pyVd7PyOuTfiP+ddRI7TDSMWQIPiAJQcYXruAhLAPfkY25IY/9kOZrBrY1IxbyO0oF1juJdUvR+qOKENEmNOK5Kgxel3E2POoUkapkGRb5huiyvT3pk0hVrSrUtUWPsWWM=
+
 deploy:
   - provider: pypi
     server: https://test.pypi.org/legacy/
     user: xatavian
     password:
-      secure: *pypi_password
+      secure: $PYPI_PASSWORD
     on:
       branch: development
   - provider: pypi
     user: xatavian
     password:
-      secure: *pypi_password
+      secure: $PYPI_PASSWORD
     on:
       branch: master
-
-
-parameters:
-  pypi_password: &pypi_password "Vomgv8jyloLuqdUbVFKUtd7BUGCP/g8/pK1N8OdwcsrtEt3Y5QEqrY5efln2TmfEHTX4FREjayGF5/0FCMSbm2MfBZ8VSfsnuJRjesr7veev1api60I7XpnZZGwwEcofkTTEtlnus9U+MtROKyiTNVIMd38bRQM5FguPvvopUt8Zj68yrbunZkJSFbxQu2iUkIzvGxSugsHAMtYBXHpm3/3j3V4FMUMvf3k1vu85Tr/IYUMHwXercwsCEi4lphJcj1VhWyKRl1oqdlxMv+Mpgd8NrKyKzLpLjxdR/CcCTV6+Z8P4APc1Dd30nU6d75vV14vPT2gScfvJfKLlVYdQNbReMr06pDWf+6VeMyoPMhbzhqSwP+z8+TeakTwFJYHCuP1scIVkAIb1zztC8k+KPY3+kKQCGBkxHoOouqJJXaFXx4OeTsQpRPdxkHV+5Zq+BonD5HUv1tlqI6h1BactOxGpRXfTHnV+B7szDhI9k+GgTTNS8TBDboqP6794RBxa4WHdOi7u8FooQlTjntcQsrqTSESqzwqcGe18fx3O9pyVd7PyOuTfiP+ddRI7TDSMWQIPiAJQcYXruAhLAPfkY25IY/9kOZrBrY1IxbyO0oF1juJdUvR+qOKENEmNOK5Kgxel3E2POoUkapkGRb5huiyvT3pk0hVrSrUtUWPsWWM="
