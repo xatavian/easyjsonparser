@@ -1,4 +1,6 @@
 language: python
+install: true
+
 test:
   script: python3 -m unittest
 
