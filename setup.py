@@ -2,10 +2,10 @@ import setuptools
 
 with open("README.md", "r") as file:
     long_description = file.read()
-  
+
 setuptools.setup(
   name="easyjsonparser",
-  version="1.0.1",
+  version="1.0.0-beta",
   author="Avi SZYCHTER",
   author_email="xentsc2@gmail.com",
   description="Serialize and deserialize JSON documents to Python data structures",
