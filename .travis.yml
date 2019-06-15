@@ -14,9 +14,10 @@ deploy:
     secure: "$PYPI_PASSWORD"
   on:
     branch: development
+  skip_existing: true
 - provider: pypi
   user: xatavian
   password:
     secure: "$PYPI_PASSWORD"
   on:
-    branch: master
+    tags: true
