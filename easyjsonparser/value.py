@@ -61,10 +61,15 @@ class _Value(object):
     def __init__(self, default: Any = Empty, optional: bool = False):
         self._default = default
         self._optional = optional
-        self._instance_creator = InstanceCreator()
-
         self.check_params()
-        self._instance_creator.compute_instance_type(self.compute_instance_type)
+
+        try:
+            self.__class__._instance_creator
+        except AttributeError:
+            self.__class__._instance_creator = InstanceCreator()
+            
+        self.__class__._instance_creator.compute_instance_type(
+            self.compute_instance_type)
 
     def check_params(self):
         if self.default is not Empty:

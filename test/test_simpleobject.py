@@ -28,6 +28,7 @@ class TestSimpleObject(unittest.TestCase):
         result = obj.find(String)
         self.assertEqual(result, "string")
 
+    @unittest.skip
     def test_to_json(self):
         obj = SimpleObject.loads(self.test_string)
         self.assertEqual(obj.to_json(),

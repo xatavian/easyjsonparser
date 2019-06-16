@@ -2,6 +2,7 @@ from .array import Array
 from .object import Object
 from .string import String
 from .numbers import Integer, Float, Boolean
+from .null import Null
 from .helper import Empty
 from .value import _Value
 
@@ -39,6 +40,3 @@ from .value import _Value
                 # return s.compute(srcval)
         # raise RuntimeError("EasyJSONOrValue unexpectidely found no valid schema to "
                            # "compute the value")
-
-
-

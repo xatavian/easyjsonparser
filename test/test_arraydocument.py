@@ -27,6 +27,7 @@ class TestArrayDocument(unittest.TestCase):
         array = SimpleArray.loads(self.test_string)
         self.assertEqual(array.find(SimpleArray.SchemaObject), array[0])
 
+    @unittest.skip
     def test_to_json(self):
         array = SimpleArray.loads(self.test_string)
         self.assertEqual(array.to_json(),
