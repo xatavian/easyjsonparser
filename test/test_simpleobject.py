@@ -5,9 +5,7 @@ from easyjsonparser import Integer, String
 
 
 class SimpleObject(JSONObjectDocument):
-    int_attr1 = Integer(optional=True, default=0)
     int_attr2 = Integer()
-    str_attr1 = String(optional=True, default="<Default>")
     str_attr2 = String()
 
 
@@ -30,6 +28,7 @@ class TestSimpleObject(unittest.TestCase):
         result = obj.find(String)
         self.assertEqual(result, "string")
 
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_to_json(self):
+        obj = SimpleObject.loads(self.test_string)
+        self.assertEqual(obj.to_json(),
+                         '{"int_attr2": 0, "str_attr2": "string"}')

@@ -124,13 +124,21 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
             return "{}"
 
         def attr_to_print(attr):
-            entry = getattr(self, attr)
-            if entry.value is Empty() and entry.is_optional:
-                return False
+            # entry = getattr(self, attr)
+            # if entry.value is Empty() and entry.is_optional:
+            #     return False
             return True
 
+        def getattr_json(self, attr):
+            obj = getattr(self, attr)
+            if isinstance(obj, NotPrimitiveInstance):
+                return obj.to_json()
+            elif isinstance(obj, str):
+                return '"{}"'.format(obj)
+            return obj
+
         ctnt = ('"{attr}": {value}'.format(attr=attr,
-                                           value=getattr(self, attr).to_json())
+                                           value=getattr_json(self, attr))
                 for attr in self.__attributes__ if attr_to_print(attr))
         return "{{{content}}}".format(content=", ".join(ctnt))
 

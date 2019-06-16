@@ -26,3 +26,9 @@ class TestArrayDocument(unittest.TestCase):
     def test_find(self):
         array = SimpleArray.loads(self.test_string)
         self.assertEqual(array.find(SimpleArray.SchemaObject), array[0])
+
+    def test_to_json(self):
+        array = SimpleArray.loads(self.test_string)
+        self.assertEqual(array.to_json(),
+                         '[{"attr1": 10, "attr2": "string1"}, '
+                         '{"attr1": 20, "attr2": "string2"}]')
