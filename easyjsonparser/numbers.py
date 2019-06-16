@@ -26,7 +26,7 @@ class Integer(_Value):
 
 class _IntegerInstance(_ValueInstance):
     def compute_to_json(self):
-        return self.value
+        return str(self.value)
 
     def check_and_sanitize_input(self, value):
         if isinstance(value, int):
@@ -59,7 +59,7 @@ class Float(_Value):
 
 class _FloatInstance(_ValueInstance):
     def compute_to_json(self):
-        return self.value
+        return str(self.value)
 
     def check_and_sanitize_input(self, value):
         if isinstance(value, float):
@@ -93,7 +93,7 @@ class Boolean(_Value):
 
 class _BoolInstance(_ValueInstance):
     def compute_to_json(self):
-        return self.value
+        return "true" if self.value else "false"
 
     def check_and_sanitize_input(self, value):
         if isinstance(value, bool):

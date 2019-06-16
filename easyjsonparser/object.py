@@ -130,12 +130,8 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
             return True
 
         def getattr_json(self, attr):
-            obj = getattr(self, attr)
-            if isinstance(obj, NotPrimitiveInstance):
-                return obj.to_json()
-            elif isinstance(obj, str):
-                return '"{}"'.format(obj)
-            return obj
+            return object.__getattribute__(
+                self, attr).to_json()
 
         ctnt = ('"{attr}": {value}'.format(attr=attr,
                                            value=getattr_json(self, attr))
