@@ -31,6 +31,8 @@ class _IntegerInstance(_ValueInstance):
     def check_and_sanitize_input(self, value):
         if isinstance(value, int):
             return value
+        elif type(self) is type(value):
+            return value.value
         elif _is_convertible(value.__class__):
             _raise_conversion_warning()
             return int(value)
@@ -64,6 +66,8 @@ class _FloatInstance(_ValueInstance):
     def check_and_sanitize_input(self, value):
         if isinstance(value, float):
             return value
+        elif type(self) is type(value):
+            return value.value
         elif _is_convertible(value.__class__):
             _raise_conversion_warning()
             return float(value)
@@ -98,6 +102,8 @@ class _BoolInstance(_ValueInstance):
     def check_and_sanitize_input(self, value):
         if isinstance(value, bool):
             return value
+        elif type(self) is type(value):
+            return value.value
         elif _is_convertible(value.__class__):
             _raise_conversion_warning()
             return bool(value)

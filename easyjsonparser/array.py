@@ -95,25 +95,33 @@ class _ArrayInstance(_ValueInstance, NotPrimitiveInstance):
     def __len__(self):
         return len(self.value)
 
+    def __iter__(self):
+        return iter(_get_value_if_primitive(val)
+                    for val in self.__values)
+
+    def __contains__(self, value):
+        return value in self
+
+    def __reversed__(self):
+        return iter(_get_value_if_primitive(val)
+                    for val in reversed(self.__values))
+
     @property
     def value(self):
         return self.__values
 
     @value.setter
     def value(self, values):
-        if not isinstance(values, (list, tuple)):
+        if isinstance(values, (list, tuple)):
+            self.__values = [None] * len(values)
+            for i, val in enumerate(values):
+                entry = self.__schema__()
+                entry.value = val
+                self.__values[i] = entry
+        elif type(self) is type(values):
+            self.__values = [val for val in values]
+        else:
             _raise_bad_value_error(values, "List or tuple expected")
-        # elif len(values) < self.__class__.__minsize__:
-        #     raise RuntimeError("Error during array assignment: "
-        #                        "expected a minimum size of {}".format(self.__class__.__minsize__))
-        # elif len(values) > self.__class__.__maxsize__:
-        #     raise RuntimeError("Error during array assignment: "
-        #                        "expected a maximum size of {}".format(self.__class__.__maxsize__))
-        self.__values = [None] * len(values)
-        for i, val in enumerate(values):
-            entry = self.__schema__()
-            entry.value = val
-            self.__values[i] = entry
 
     def to_json(self):
         return "[{}]".format(", ".join(array_val.to_json()

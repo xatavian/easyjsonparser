@@ -111,32 +111,19 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
             if self.__attributes__ is not None else 0)
 
     def __str__(self):
+        def get_val(self, attr):
+            result = getattr(self, attr)
+            if isinstance(result, str):
+                return '"{}"'.format(result)
+            return result
+
         ctnt = ('"{name}": {value}'.format(name=objname,
-                                           value=getattr(self, objname))
+                                           value=get_val(self, objname))
                 for objname in self.__attributes__)
         return "<JSON {classname}: {{{content}}}>".format(
             classname=self.__class__.__name__,
             content=', '.join(ctnt)
         )
-
-    def compute_to_json(self):
-        if self.__attributes__ is None:
-            return "{}"
-
-        def attr_to_print(attr):
-            # entry = getattr(self, attr)
-            # if entry.value is Empty() and entry.is_optional:
-            #     return False
-            return True
-
-        def getattr_json(self, attr):
-            return object.__getattribute__(
-                self, attr).to_json()
-
-        ctnt = ('"{attr}": {value}'.format(attr=attr,
-                                           value=getattr_json(self, attr))
-                for attr in self.__attributes__ if attr_to_print(attr))
-        return "{{{content}}}".format(content=", ".join(ctnt))
 
     def __getattribute__(self, item):
         builtin_getattr = object.__getattribute__
@@ -152,23 +139,57 @@ class _ObjectInstance(_ValueInstance, NotPrimitiveInstance):
         attr_schema = object.__getattribute__(self, item)
         attr_schema.value = value
 
+    def __contains__(self, key):
+        return key in self.__attributes__
+
+    def __iter__(self):
+        return iter(self.__attributes__)
+
+    def values(self):
+        return {key: getattr(self, key) for key in self}
+
+    def items(self):
+        return [(key, getattr(self, key)) for key in self]
+
+    def compute_to_json(self):
+        if self.__attributes__ is None:
+            return "{}"
+
+        def attr_to_print(attr):
+            # entry = getattr(self, attr)
+            # if entry.value is Empty() and entry.is_optional:
+            #     return False
+            return True
+
+        def getattr_json(self, attr):
+            return object.__getattribute__(self, attr).to_json()
+
+        ctnt = ('"{attr}": {value}'.format(
+                attr=attr, value=getattr_json(self, attr))
+                for attr in self.__attributes__ if attr_to_print(attr))
+        return "{{{content}}}".format(content=", ".join(ctnt))
+
     def check_and_sanitize_input(self, value):
-        if not isinstance(value, dict):
+        if isinstance(value, dict):
+            self.check_keys(value)
+        elif type(self) is type(value):
+            pass
+        else:
             _raise_bad_value_error(
                 value,
                 self.__property_name__,
-                "Dict type expected"
-            )
+                "Dict type expected")
+        return value
 
-        for key in value:
+    def check_keys(self, src):
+        for key in src:
             if key not in self.__attributes__:
                 _raise_bad_value_error(
-                    value,
+                    src,
                     self.__property_name__,
                     'Unexpected key {key} for object-type "{classname}"'
                     .format(key=key, classname=self.__class__.__name__)
                 )
-        return value
 
     @property
     def value(self):

@@ -22,6 +22,8 @@ class _NullInstance(_ValueInstance):
     def check_and_sanitize_input(self, value):
         if value is None:
             return value
+        elif type(self) is type(value):
+            return value.value
         elif value is not Empty:
             _raise_bad_value_error(value, self.__property_name__, "None expected")
         else:
