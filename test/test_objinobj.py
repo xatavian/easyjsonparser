@@ -19,6 +19,15 @@ class TestObjInObj(unittest.TestCase):
         })
         self.assertTrue(obj1.prop.attr2, 1)
 
+    def test_to_json(self):
+        obj = TestObjectWithObject.load({
+            "prop": {
+                "attr1": "1", "attr2": 1
+            }
+        })
+        self.assertEqual(obj.to_json(),
+                         '{"prop": {"attr1": "1", "attr2": 1}}')
+
     @unittest.skip
     def test_find(self):
         obj = TestObjectWithObject.load({
